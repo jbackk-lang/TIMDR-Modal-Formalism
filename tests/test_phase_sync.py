@@ -87,9 +87,24 @@ def test_is_resonant_identical_modalities():
 
 
 def test_is_resonant_frequency_at_threshold_is_false():
-    # |f_i-f_j| = eps_f dokladnie -> NIE < eps_f -> nie rezonans (scisla nierownosc)
-    m_i = Modality(f=1.0, phi=0.0, A=1.0)
-    m_j = Modality(f=1.0 + 1e-6, phi=0.0, A=1.0)
+    # |f_i-f_j| = eps_f dokladnie -> NIE < eps_f -> nie rezonans (scisla nierownosc).
+    #
+    # UWAGA (znaleziono przez uzytkownika przez pytest, naprawiono tutaj):
+    # oryginalna wersja uzywala m_j=Modality(f=1.0+1e-6, ...) -- to NIE daje
+    # dokladnie 1e-6 roznicy w float64. 1e-6 trzeba zaokraglic do najblizszej
+    # reprezentowalnej wielokrotnosci ULP w poblizu 1.0 (~2.22e-16), wiec
+    # (1.0+1e-6)-1.0 wychodzi ~9.9999999977e-07 -- SCISLE MNIEJSZE niz
+    # eps_f=1e-6 -- wiec is_resonant() (poprawnie, zgodnie z Aksjomatem 5)
+    # zwracalo True, a test blednie oczekiwal False. To byl blad TESTU
+    # (zalozenie dokladnej arytmetyki), nie bledu w is_resonant().
+    #
+    # Naprawa: licz roznice od 0.0, nie od 1.0 -- wtedy m_j.f jest po prostu
+    # zapisana wartoscia 1e-6 (bez zadnego dodawania/zaokraglania), wiec
+    # abs(m_i.f-m_j.f) to DOKLADNIE ten sam bit-wzorzec co eps_f=1e-6 ->
+    # rownosc, nie "mniejsze niz" -> scisla nierownosc daje False dokladnie
+    # jak zamierzone.
+    m_i = Modality(f=0.0, phi=0.0, A=1.0)
+    m_j = Modality(f=1e-6, phi=0.0, A=1.0)
     assert is_resonant(m_i, m_j, eps_f=1e-6, eps_phi=1e-6) is False
 
 
