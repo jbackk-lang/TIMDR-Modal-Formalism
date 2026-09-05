@@ -13,6 +13,15 @@ from .phase_sync import (
     is_resonant,
     local_time_from_global,
 )
+from .real_data_validation import (
+    CalibrationResult,
+    RealResonanceResult,
+    WindowedModality,
+    calibrate_epsilons,
+    extract_modalities,
+    load_station_csv,
+    real_data_resonance_report,
+)
 
 __all__ = [
     "Modality",
@@ -20,4 +29,11 @@ __all__ = [
     "interference",
     "is_resonant",
     "local_time_from_global",
+    "CalibrationResult",
+    "RealResonanceResult",
+    "WindowedModality",
+    "calibrate_epsilons",
+    "extract_modalities",
+    "load_station_csv",
+    "real_data_resonance_report",
 ]
