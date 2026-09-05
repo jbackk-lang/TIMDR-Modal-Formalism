@@ -8,12 +8,10 @@ bez żadnej realizacji numerycznej, w odróżnieniu od gałęzi M/S
 Modalność `(f,φ,A)` — Aksjomat 3, dosłownie. Interferencja
 `I(t)=ΣAᵢsin(2πfᵢt+φᵢ)` — Aksjomat 4, dosłownie. Rezonans modalny
 `|fᵢ-fⱼ|<ε_f ∧ |φᵢ-φⱼ|<ε_φ` — Aksjomat 5, dosłownie. Plus jedna nowa
-funkcja, `local_time_from_global`: formalizacja postulatu
-"`t_lokalne=f(τ_globalne)`" z dyskusji Chronoprocesu
-`Ξ=(T,x,Γ,φ)` (patrz `GIA-TIMDR/SKILL_timdr-signal-framework.md`
-— **uwaga**: ta konstrukcja Chronoprocesu na dziś istnieje tylko w
-rozmowie, która doprowadziła do tego repo, jeszcze nie jest zapisana w
-tamtym dokumencie).
+funkcja, `local_time_from_global`: formalizacja postulatu z §7.3
+głównego README GIA-TIMDR, "`t_lokalne=f(τ_globalne)`", jako część
+Chronoprocesu `Ξ=(T,x,Γ,φ)` — pełny opis:
+`GIA-TIMDR/docs/theory/TIMDR_Chronoprocess.md` (§4).
 
 ## 🔀 Mapa synchronizacji faz `f`
 
@@ -74,10 +72,31 @@ dowolnej pary modalności i dowolnego `τ_globalne`,
 dokładnie definiująca właściwość mapy `f`, nie tylko przypadek
 brzegowy.
 
-**⚠️ Nie uruchomione w tej sesji.** Napisane bez dostępu do sandboxa
-bash — liczby w komentarzach testów są ręcznie prześledzone, ale
-`pytest` nie został faktycznie odpalony. Uruchom `pytest tests/ -v`
-przed zaufaniem tym liczbom.
+**✅ Zweryfikowane.** `pytest tests/ -v` — 17/17 testów przeszło.
+Jeden test (`test_is_resonant_frequency_at_threshold_is_false`) padł
+przy pierwszym uruchomieniu z powodu błędu w samym teście (float
+`1.0+1e-6` nie daje dokładnie różnicy `1e-6`), nie w `is_resonant()` —
+naprawiony w `tests/test_phase_sync.py`.
+
+## 🌍 Walidacja na realnych danych + kalibracja
+
+`timdr_modal/real_data_validation.py` — pierwszy kontakt `is_resonant()`
+(Aksjomat 5) z prawdziwymi, zmierzonymi danymi (dotąd testowany
+wyłącznie na ręcznie dobranych liczbach syntetycznych — patrz
+`tests/test_phase_sync.py`). Dane: dwa prawdziwe, ciągłe ślady
+sejsmiczne (stacje CI.CLC i CI.RIO, kanał HHZ, 100 Hz) zarejestrowane
+podczas faktycznego trzęsienia ziemi M7.1 Ridgecrest 2019-07-06,
+pobrane przez autora z IRIS/EarthScope (patrz
+`TIMDR-Earthquake-Core/real_waveform_test.py` w repo siostrzanym).
+`(f,φ,A)` wydobywane są per 10-sekundowe okno przez szczyt FFT, z
+fazą przeliczoną na wspólny punkt odniesienia `t=0` (obie stacje mają
+identyczny czas startu śladu). Test permutacyjny + kontrola pozytywna
+(wzorzec z `GIA-TIMDR/docs/theory/Resonance_M_Operator_Empiryczny.md`
+§3), oraz `calibrate_epsilons()`, która proponuje `eps_f`/`eps_φ` z
+rozkładu realnych różnic albo — uczciwie — zgłasza brak mocy
+statystycznej zamiast zgadywać liczby. Pełna metodologia i **jawne
+zastrzeżenie o bardzo małej próbie (~36 okien z jednego zdarzenia)**
+w docstringu modułu; testy w `tests/test_real_data_validation.py`.
 
 ## ⚠️ Czego to NIE robi
 
