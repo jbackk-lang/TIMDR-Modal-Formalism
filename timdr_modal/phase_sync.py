@@ -3,10 +3,10 @@ timdr_modal/phase_sync.py
 
 Galaz K (modalna) chronoprocesu: mapa synchronizacji faz `f`, ktora
 daje sprawdzalna tresc postulatowi "t_lokalne = f(tau_globalne)" z
-dyskusji Chronoprocesu Xi=(T,x,Gamma,phi)
-(GIA-TIMDR/SKILL_timdr-signal-framework.md -- patrz UWAGA nizej,
-ta konstrukcja NIE jest tam jeszcze zapisana, tylko w tej sesji czatu;
-docstringi tego modulu to jedyne miejsce, gdzie jest ona spisana na tu).
+sekcji 7.3 glownego README GIA-TIMDR. Pelny opis Chronoprocesu
+Xi=(T,x,Gamma,phi), w tym tej konstrukcji: `GIA-TIMDR/docs/theory/
+TIMDR_Chronoprocess.md` (sekcja 4) oraz `GIA-TIMDR/SKILL_timdr-signal-
+framework.md` (sekcja 5, skrocona wersja).
 
 Obiekt modalnosci `(f,phi,A)` -- czestotliwosc/faza/amplituda -- jest
 DOKLADNIE Aksjomatem 3 z GIA-TIMDR/docs/theory/Axioms_K_TIMDR.md:
@@ -61,9 +61,13 @@ formalizacja postulatu "t_lokalne=f(tau_globalne)" DANE aksjomaty
 dokladnie takie, jakie sa dzisiaj -- pierwsza instancja galezi K jako
 kodu (K nie mialo dotad ZADNEJ implementacji w tym ekosystemie).
 
-UWAGA O WYKONANIU: napisane w sesji bez dostepu do sandboxa bash --
-kazda liczba w komentarzach tests/test_phase_sync.py jest przesledzona
-recznie, ale NIE URUCHOMIONA. Uruchom `pytest tests/ -v`.
+UWAGA O WYKONANIU: napisane w sesji bez dostepu do sandboxa bash,
+odtad faktycznie uruchomione przez uzytkownika (`pytest tests/ -v`) i
+ZWERYFIKOWANE -- 17/17 testow przeszlo. Jeden test
+(`test_is_resonant_frequency_at_threshold_is_false`) najpierw padl --
+byl to blad TESTU (zalozenie dokladnej arytmetyki float dla
+`1.0+1e-6`), nie bledu w `is_resonant()`; naprawiony, patrz komentarz
+w tests/test_phase_sync.py.
 """
 from __future__ import annotations
 
