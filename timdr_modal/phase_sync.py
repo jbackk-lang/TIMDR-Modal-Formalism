@@ -82,6 +82,9 @@ __all__ = [
     "interference",
     "is_resonant",
     "local_time_from_global",
+    "PhaseDispersionResult",
+    "modal_phase_dispersion",
+    "modal_phase_tempo",
 ]
 
 
@@ -152,3 +155,111 @@ def local_time_from_global(local: Modality, global_: Modality, tau_global) -> np
     tau_global = np.asarray(tau_global, dtype=float)
     theta_g = instantaneous_phase(global_, tau_global)
     return (theta_g - local.phi) / (2.0 * np.pi * local.f)
+
+
+# ---------------------------------------------------------------------
+# Lambda_K, tau_K: dyspersja fazowa i jej tempo zmiany (DODANE 2026-09-10)
+# ---------------------------------------------------------------------
+#
+# PRE-REJESTRACJA (zamrozone TUTAJ, przed uruchomieniem jakiegokolwiek
+# testu na tych funkcjach):
+#
+# Kontekst: ten sam wniosek uzytkownika co w weingarten.py (galaz G) --
+# traktowac Lambda/tau z META-DYNAMICS jako RODZINE sygnalow, jeden
+# ksztalt pytania realizowany OSOBNYM wzorem w kazdej galezi. Audyt PRZED
+# napisaniem kodu (grep na `Axioms_K_TIMDR.md` i tym module) pokazal
+# ZERO istniejacego operatora dyspersji/tempa w galezi K -- Aksjomat 5
+# ma tylko PROGOWE porownanie PARY modalnosci (rezonans/brak), nie ciagla
+# miare "jak bardzo caly zbior modalnosci jest zsynchronizowany W CHWILI
+# t", ani tym bardziej jej tempa zmiany.
+#
+# KLUCZOWA ROZNICA wzgledem proby w galezi G (odrzuconej tam): modalnosci
+# TU maja WSPOLNY, GLOBALNY uklad odniesienia dla fazy chwilowej --
+# theta_i(t) = 2*pi*f_i*t + phi_i, WSZYSTKIE na tym samym okregu (mod
+# 2*pi), bez problemu "roznych przestrzeni stycznych" z siatki 3D. Wiec
+# TUTAJ (w przeciwienstwie do proby z kierunkami krzywizny w G) DA SIE
+# uzasadnione uzyc dokladnie tego samego zespolonego parametru porzadku
+# co circular_dispersion() w TIMDR-Quantum-Lattice i wind_direction_
+# coherence() w Synoptyk-v3 -- TA SAMA formula, bo TU faktycznie jest
+# TEN SAM obiekt matematyczny (uklad wielu oscylatorow na wspolnym
+# okregu fazowym), nie tylko podobienstwo slowne.
+#
+# PRZYJETE DEFINICJE:
+#
+#   Lambda_K(modalities, t) = 1 - |mean_i(exp(i*theta_i(t)))|
+#
+# gdzie theta_i(t) = instantaneous_phase(modality_i, t) (Aksjomat 4,
+# funkcja juz istniejaca powyzej w tym pliku). Interpretacja identyczna
+# jak wszedzie indziej w ekosystemie: 0 = wszystkie modalnosci maja
+# identyczna faze chwilowa w t (idealna synchronizacja), ~1 = fazy
+# rozrzucone losowo po okregu.
+#
+#   tau_K(modalities, t, dt) = |Lambda_K(t+dt) - Lambda_K(t)| / dt
+#
+# Tempo zmiany dyspersji fazowej -- bezposrednia analogia do
+# tau=srednie|D(t)-D(t-1)| w meta_adapter.py (Quantum-Lattice), INNY
+# wzor (pochodna Lambda_K zamiast tempa zmiany defektu D), bo Lambda_K
+# jest tu jedynym istniejacym "polem" do rozniczkowania w czasie -- w
+# tej galezi NIE ma odrebnego kanalu "defektu" jak D(x,y,t) na siatce.
+#
+# WAZNE, NIETRYWIALNE: modalnosci sa monochromatyczne (STALE f,phi --
+# Aksjomat 3, explicite bez dynamiki sprzezenia, patrz UWAGA O ZAKRESIE
+# w naglowku modulu) -- ale to NIE oznacza, ze Lambda_K(t) jest stala w
+# czasie dla WIELU modalnosci o ROZNYCH czestotliwosciach: wzgledna faza
+# miedzy para i,j narasta liniowo jako 2*pi*(f_i-f_j)*t, wiec Lambda_K(t)
+# (funkcja WSZYSTKICH par naraz) generalnie OSCYLUJE w czasie (typowe
+# zjawisko dudnienia/beating dla ukladow wielu czestosci) -- to jest
+# realna, nietrywialna dynamika do zmierzenia, NIE martwa stala.
+# WYJATEK, przedrejestrowany jako analityczna kontrola negatywna: gdy
+# WSZYSTKIE f_i sa identyczne, wzgledne fazy sa DOKLADNIE stale (roznia
+# sie tylko o stala phi_i-phi_j) -> Lambda_K(t) jest wtedy DOKLADNIE
+# stala funkcja t -> tau_K==0 analitycznie (nie przyblizenie numeryczne).
+#
+# PRZEDREJESTROWANE KONTROLE (przed uruchomieniem):
+#   Lambda_K + pozytywna: modalnosci o IDENTYCZNYCH (f,phi) -> Lambda_K=0
+#     dla kazdego t (synchronizacja doskonala z definicji).
+#   Lambda_K - negatywna: wiele modalnosci o roznych, losowych phi i
+#     bliskich f (generyczne t) -> Lambda_K wyraznie > 0.
+#   tau_K + pozytywna (tau_K==0 DOKLADNIE): wszystkie f_i rownE (roznymi
+#     phi) -> patrz wyzej, analityczna stalosc.
+#   tau_K - negatywna (tau_K>0): rozne f_i -> Lambda_K(t) sie zmienia,
+#     tau_K > 0 dla wiekszosci wyborow t,dt.
+
+
+@dataclass
+class PhaseDispersionResult:
+    """Wynik Lambda_K w jednej chwili t -- patrz PRE-REJESTRACJA powyzej."""
+
+    lambda_k: float
+    mean_resultant_length: float  # |Z|, tak ze lambda_k = 1 - to
+    n_modalities: int
+
+
+def modal_phase_dispersion(modalities: Sequence[Modality], t: float) -> PhaseDispersionResult:
+    """Lambda_K(modalities, t) -- dyspersja fazowa (zespolony parametr
+    porzadku) zbioru modalnosci w JEDNEJ chwili t. Patrz PRE-REJESTRACJA
+    powyzej za pelne uzasadnienie wzoru."""
+    if len(modalities) == 0:
+        raise ValueError("modal_phase_dispersion() wymaga >=1 modalnosci")
+    thetas = np.array([instantaneous_phase(m, t) for m in modalities], dtype=float)
+    z = np.mean(np.exp(1j * thetas))
+    resultant = float(np.abs(z))
+    return PhaseDispersionResult(
+        lambda_k=1.0 - resultant, mean_resultant_length=resultant, n_modalities=len(modalities),
+    )
+
+
+def modal_phase_tempo(modalities: Sequence[Modality], t: float, dt: float) -> float:
+    """tau_K(modalities, t, dt) -- tempo zmiany Lambda_K w chwili t,
+    przyblizone roznica skonczona krok naprzod. Patrz PRE-REJESTRACJA
+    powyzej za pelne uzasadnienie (w tym analityczny przypadek tau_K==0
+    dla identycznych czestotliwosci).
+
+    Rzuca ValueError dla dt<=0 (kierunek/rozmiar kroku musi byc jawny,
+    nie domyslny -- ta sama dyscyplina co dt=0 w
+    TIMDR-META-DYNAMICS/core_meta/meta_operator_M.py)."""
+    if dt <= 0:
+        raise ValueError(f"dt musi byc > 0, dostano {dt}")
+    lambda_t = modal_phase_dispersion(modalities, t).lambda_k
+    lambda_t_plus_dt = modal_phase_dispersion(modalities, t + dt).lambda_k
+    return abs(lambda_t_plus_dt - lambda_t) / dt
