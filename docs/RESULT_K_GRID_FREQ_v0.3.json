@@ -1,0 +1,30 @@
+{
+  "prereg": "docs/PREREG_K_GRID_FREQ_v0.3.md",
+  "data_file": "SYNC01.csv",
+  "data_file_sha256": "2f81120c9057adac332cd910c92130cc1c023068940f61cd824d7e860a0bee83",
+  "channel_a": "f50_PT",
+  "channel_b": "f50_TR",
+  "run_start_row": 2071846,
+  "run_start_time": "2019-08-01 23:30:46",
+  "run_len_s": 238902,
+  "window_sec": 600.0,
+  "n_windows": 398,
+  "statistic": "mean zero-lag Pearson correlation of linearly detrended windows",
+  "insufficient_data_for_test": false,
+  "real_stat_mean_corr": 0.900929329482727,
+  "real_r_windows_median": 0.9057109336208402,
+  "real_r_windows_p25_p75": [
+    0.8822218188717639,
+    0.925486733336609
+  ],
+  "null_stat_mean": 0.029157770101771154,
+  "null_stat_std": 0.011144242399939379,
+  "z_score_vs_null": 78.22618425687672,
+  "n_permutations": 2000,
+  "p_value": 0.0004997501249375312,
+  "positive_control_stat": 1.0,
+  "positive_control_p_value": 0.0004997501249375312,
+  "controls_passed": true,
+  "alpha": 0.05,
+  "verdict": "SUPPORTED"
+}

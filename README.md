@@ -161,6 +161,22 @@ identyczności. Naprawa wymaga przeprojektowania samej statystyki
 testu (nie kolejnego parametru) — pełne szczegóły w
 `RESULT_K_GRID_FREQ_v0.2.md`.
 
+**v0.3 (nowa statystyka — korelacja krzyżowa) — PIERWSZY SUPPORTED w
+tym repo:** zamiast dyskretnej ekstrakcji `(f,φ,A)`+`is_resonant()`,
+korelacja Pearsona zero-lag między odtrendowanymi oknami PT/TR (398
+okien po 600 s). Wynik: `mean(r_w)=0.90` (mediana 0.91), z=78 względem
+null permutacyjnego, p=0.0005, kontrola pozytywna czysta —
+**SUPPORTED**. **Kluczowe zastrzeżenie interpretacyjne**: domena
+(częstotliwość sieci AC w jednym obszarze synchronicznym) została
+wybrana WŁAŚNIE dlatego, że fizyka energetyki a priori GWARANTUJE
+wyrównanie częstotliwości — to potwierdza, że formalizm K poprawnie
+wykrywa znane zjawisko, gdy jest ono fizycznie zagwarantowane, a nie
+odkrycie nowego rezonansu w otwartej hipotezie (jak Ridgecrest/MARS
+DAS, które pozostają bez zmian: niejednoznaczny / NOT SUPPORTED).
+Nie spełnia kryteriów statusu "ustalony (diagnostyka)" (brak
+syntetycznej kontroli, jedna para lokalizacji, brak repliki) — pełna
+uczciwa interpretacja w `RESULT_K_GRID_FREQ_v0.3.md`.
+
 ## ⚠️ Czego to NIE robi
 
 Nie implementuje sprzężenia oscylatorów (Kuramoto-style), nie
