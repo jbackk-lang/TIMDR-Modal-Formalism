@@ -114,6 +114,18 @@ przechodzi (p≈0.0005, mechanika testu działa), ale test główny
 mediany null permutacyjnego). Uczciwy wynik negatywny, nie porażka
 metody — pełne ograniczenia i "co dalej" w `RESULT_K_MARS_DAS_v0.1.md`.
 
+**v0.2 (poprawka doboru kanałów):** v0.1 użył skrajnych końców
+kabla (~14,8 km) — dla kabla JEDNOKIERUNKOWEGO (MARS: brzeg→węzeł,
+bez pętli) to wprowadza niedopasowanie czasowe: fala potrzebuje
+dziesiątek sekund, żeby dotrzeć z jednego końca na drugi, znacznie
+dłużej niż `window_sec=1.0s`, więc porównywane okna nie były tym samym
+fragmentem fali. v0.2 (`docs/PREREG_K_MARS_DAS_v0.2.md` +
+`RESULT_K_MARS_DAS_v0.2.md`) używa bliskich kanałów (0 i 7, 36,4 m —
+poniżej progu opóźnienia, powyżej długości bazy pomiarowej 20 m).
+Wynik: **NOT SUPPORTED, jeszcze mocniej** (0/60 okien, p=1.0) —
+poprawka nie ujawniła ukrytego rezonansu, wzmacnia wniosek negatywny
+zamiast go podważać.
+
 ## ⚠️ Czego to NIE robi
 
 Nie implementuje sprzężenia oscylatorów (Kuramoto-style), nie
