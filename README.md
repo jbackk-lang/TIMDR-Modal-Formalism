@@ -126,6 +126,28 @@ Wynik: **NOT SUPPORTED, jeszcze mocniej** (0/60 okien, p=1.0) —
 poprawka nie ujawniła ukrytego rezonansu, wzmacnia wniosek negatywny
 zamiast go podważać.
 
+### Trzeci test: częstotliwość sieci elektroenergetycznej (fizycznie najsilniej umotywowany kandydat)
+
+`docs/PREREG_K_GRID_FREQ_v0.1.md` + `docs/RESULT_K_GRID_FREQ_v0.1.md` —
+test na danych odchylenia częstotliwości 50 Hz (Jumar i in., KIT,
+arXiv:2006.01771) w JEDNYM obszarze synchronicznym (Continental Europe):
+Lizbona (PT) vs Stambuł (TR), ~3400 km, para wybrana PRZED pobraniem
+pliku jako najbardziej rygorystyczny test (największy dystans). W
+odróżnieniu od Ridgecrest/MARS, fizyka sieci AC z definicji wymusza
+niemal identyczną częstotliwość w całym obszarze synchronicznym — to
+najsilniejszy a priori argument za wyrównaniem częstotliwości spośród
+wszystkich testów K dotąd. Okno 600 s (konwencja literatury oscylacji
+międzyobszarowych), 398 okien z najdłuższego ciągłego odcinka o
+poprawnej jakości pomiaru (66.4 h). Wynik: **INCONCLUSIVE** — nie z
+powodu braku sygnału, tylko dlatego, że kalibracja `eps_f` (metoda
+percentylowa) zdegenerowała się do `0.0` (96.5% okien miało DOKŁADNIE
+równą częstotliwość szczytową PT/TR, bo siatka FFT przy 600 s ma tylko
+~10-11 możliwych wartości), co przez ostrą nierówność w `is_resonant()`
+unieważniło nawet kontrolę pozytywną (kanał sparowany sam ze sobą).
+Sam fakt niemal-zawsze-identycznej częstotliwości jest sugestywny, ale
+nie przeszedł przez bramkę kontrolną, więc nie może być zgłoszony jako
+potwierdzony — pełna diagnoza mechanizmu w `RESULT_K_GRID_FREQ_v0.1.md`.
+
 ## ⚠️ Czego to NIE robi
 
 Nie implementuje sprzężenia oscylatorów (Kuramoto-style), nie
