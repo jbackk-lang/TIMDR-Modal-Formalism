@@ -12,6 +12,9 @@ from .phase_sync import (
     interference,
     is_resonant,
     local_time_from_global,
+    PhaseDispersionResult,
+    modal_phase_dispersion,
+    modal_phase_tempo,
 )
 from .real_data_validation import (
     CalibrationResult,
@@ -29,6 +32,9 @@ __all__ = [
     "interference",
     "is_resonant",
     "local_time_from_global",
+    "PhaseDispersionResult",
+    "modal_phase_dispersion",
+    "modal_phase_tempo",
     "CalibrationResult",
     "RealResonanceResult",
     "WindowedModality",
