@@ -98,6 +98,22 @@ statystycznej zamiast zgadywać liczby. Pełna metodologia i **jawne
 zastrzeżenie o bardzo małej próbie (~36 okien z jednego zdarzenia)**
 w docstringu modułu; testy w `tests/test_real_data_validation.py`.
 
+### Drugi test: prawdziwy sygnał ŚWIATŁOWODOWY (DAS), nie sejsmometryczny
+
+`docs/PREREG_K_MARS_DAS_v0.1.md` + `docs/RESULT_K_MARS_DAS_v0.1.md` —
+pierwszy test `is_resonant()` na danych Distributed Acoustic Sensing:
+MARS/SeaFOAM, roczny eksperyment DAS na 52-km podmorskim kablu
+telekomunikacyjnym w Monterey Bay (publiczny zbiór PubDAS/Hugging Face,
+`AI4EPS/quakeflow_das`). Dwa kanały (skrajne końce ~14.8 km
+zarejestrowanego odcinka, reguła geometryczna zamrożona przed
+pobraniem) jako modalności — w odróżnieniu od Ridgecrest, wszystkie
+kanały DAS dzielą JEDEN zegar interrogatora, więc nie trzeba
+przeliczenia offsetu między stacjami. Wynik: kontrola pozytywna
+przechodzi (p≈0.0005, mechanika testu działa), ale test główny
+**NOT SUPPORTED** (p=0.365, 1/60 okien rezonansowych — poniżej
+mediany null permutacyjnego). Uczciwy wynik negatywny, nie porażka
+metody — pełne ograniczenia i "co dalej" w `RESULT_K_MARS_DAS_v0.1.md`.
+
 ## ⚠️ Czego to NIE robi
 
 Nie implementuje sprzężenia oscylatorów (Kuramoto-style), nie
