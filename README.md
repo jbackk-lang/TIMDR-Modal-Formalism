@@ -148,6 +148,19 @@ Sam fakt niemal-zawsze-identycznej częstotliwości jest sugestywny, ale
 nie przeszedł przez bramkę kontrolną, więc nie może być zgłoszony jako
 potwierdzony — pełna diagnoza mechanizmu w `RESULT_K_GRID_FREQ_v0.1.md`.
 
+**v0.2 (poprawka kalibracji — zero-padding FFT 16×):** przewidywanie
+z prerejestracji v0.2, że drobniejsza siatka FFT usunie masę punktową
+w rozkładzie `|Δf|`, zostało **sfałszowane** — odsetek dokładnych
+wiązań spadł tylko nieznacznie (96.5%→94.7%), `eps_f` wciąż kalibruje
+się do `0.0`, kontrola pozytywna wciąż nie przechodzi. Dodatkowa
+diagnoza: PT i TR trafiają w ten sam dominujący bin FFT w 94.7% okien
+mimo ~50 kandydujących binów (losowo oczekiwane ~2%) — sugestywna
+silna zgodność widmowa, ale niezgłaszalna jako potwierdzenie, bo test
+zaprojektowany był do wykrywania ciągłej bliskości, nie dyskretnej
+identyczności. Naprawa wymaga przeprojektowania samej statystyki
+testu (nie kolejnego parametru) — pełne szczegóły w
+`RESULT_K_GRID_FREQ_v0.2.md`.
+
 ## ⚠️ Czego to NIE robi
 
 Nie implementuje sprzężenia oscylatorów (Kuramoto-style), nie
