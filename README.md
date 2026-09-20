@@ -188,6 +188,20 @@ pochodzą z tego samego 41-dniowego pliku i miesiąca (sierpień 2019),
 więc replika na innym roku/źródle/parze lokalizacji pozostaje otwarta.
 Pełne szczegóły w `RESULT_K_GRID_FREQ_v0.4.md`.
 
+**v0.5 (replika na niezależnym pliku źródłowym) — trzecia replikacja
+potwierdzona:** ta sama statystyka, uruchomiona na osobnych, surowych
+plikach per-stacja 10 Hz (`PT_LI01_100ms.zip`/`TUR-IS01_100ms.zip`,
+KIT Power Grid Frequency Database, udostępnione osobno 2023-04-21) —
+inny plik i 10× wyższa rozdzielczość niż `SYNC01.csv`, okno przesunięte
+o ~3 tygodnie (2019-07-11/12 vs sierpień). Wynik: `mean(r_w)=0.88`
+(mediana 0.88, IQR 0.86-0.93), z=18.2 (niżej niż v0.3/v0.4 głównie
+przez mniej okien: 44 vs 398/305), p=0.0005, kontrola pozytywna czysta
+— **SUPPORTED**. **Uczciwe zastrzeżenie**: mimo osobnych plików to
+wciąż ta sama kampania pomiarowa 2019 i ta sama para stacji — prawdziwa
+replika na innym roku/innym źródle/innej parze lokalizacji pozostaje
+otwarta. Pełne szczegóły, w tym tabela porównawcza v0.3/v0.4/v0.5, w
+`RESULT_K_GRID_FREQ_v0.5.md`.
+
 ## ⚠️ Czego to NIE robi
 
 Nie implementuje sprzężenia oscylatorów (Kuramoto-style), nie
