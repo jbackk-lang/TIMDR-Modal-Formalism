@@ -174,8 +174,19 @@ wykrywa znane zjawisko, gdy jest ono fizycznie zagwarantowane, a nie
 odkrycie nowego rezonansu w otwartej hipotezie (jak Ridgecrest/MARS
 DAS, które pozostają bez zmian: niejednoznaczny / NOT SUPPORTED).
 Nie spełnia kryteriów statusu "ustalony (diagnostyka)" (brak
-syntetycznej kontroli, jedna para lokalizacji, brak repliki) — pełna
-uczciwa interpretacja w `RESULT_K_GRID_FREQ_v0.3.md`.
+syntetycznej kontroli, jedna para lokalizacji) — pełna uczciwa
+interpretacja w `RESULT_K_GRID_FREQ_v0.3.md`.
+
+**v0.4 (replika na niezależnym oknie) — replikacja potwierdzona:**
+dokładnie ta sama statystyka co v0.3, uruchomiona na drugim, ciągłym
+i nienachodzącym oknie tego samego pliku (305 okien, 2019-08-11, 10 dni
+po oknie v0.3). Wynik: `mean(r_w)=0.92` (mediana 0.92), z=63, p=0.0005,
+kontrola pozytywna czysta — **SUPPORTED**, spójne z v0.3 (mediany i IQR
+obu okien praktycznie się pokrywają). To domyka zastrzeżenie "brak
+repliki" z v0.3 — ale tylko na wymiarze OKNA CZASOWEGO: oba okna
+pochodzą z tego samego 41-dniowego pliku i miesiąca (sierpień 2019),
+więc replika na innym roku/źródle/parze lokalizacji pozostaje otwarta.
+Pełne szczegóły w `RESULT_K_GRID_FREQ_v0.4.md`.
 
 ## ⚠️ Czego to NIE robi
 
