@@ -20,8 +20,8 @@ import numpy as np
 import pandas as pd
 from scipy.signal import detrend
 
-DATA_FILE_PT = Path("/sessions/blissful-focused-lamport/mnt/Downloads/PT_LI01_100ms.zip")
-DATA_FILE_TUR = Path("/sessions/blissful-focused-lamport/mnt/Downloads/TUR-IS01_100ms.zip")
+DATA_FILE_PT = Path("/sessions/blissful-focused-lamport/mnt/a/PT_LI01_100ms.zip")
+DATA_FILE_TUR = Path("/sessions/blissful-focused-lamport/mnt/a/TUR-IS01_100ms.zip")
 
 WINDOW_SEC = 600.0
 FS_HZ = 10.0  # native resolution of this source (v0.1-v0.4 used 1.0 Hz)

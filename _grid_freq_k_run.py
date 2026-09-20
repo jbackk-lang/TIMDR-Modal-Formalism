@@ -25,7 +25,7 @@ from timdr_modal.real_data_validation import (  # noqa: E402
 )
 from timdr_modal.phase_sync import Modality, is_resonant  # noqa: E402
 
-DATA_FILE = Path("/sessions/blissful-focused-lamport/mnt/Downloads/SYNC01.csv")
+DATA_FILE = Path("/sessions/blissful-focused-lamport/mnt/a/SYNC01.csv")
 FS_HZ = 1.0
 WINDOW_SEC = 600.0
 N_PERMUTATIONS = 2000

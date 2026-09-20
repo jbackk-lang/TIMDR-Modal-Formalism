@@ -15,7 +15,7 @@ import numpy as np
 import pandas as pd
 from scipy.signal import detrend
 
-DATA_FILE = Path("/sessions/blissful-focused-lamport/mnt/Downloads/SYNC01.csv")
+DATA_FILE = Path("/sessions/blissful-focused-lamport/mnt/a/SYNC01.csv")
 WINDOW_SEC = 600.0
 FS_HZ = 1.0
 N_PERMUTATIONS = 2000
