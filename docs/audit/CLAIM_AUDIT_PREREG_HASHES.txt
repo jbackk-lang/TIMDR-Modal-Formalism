@@ -1,0 +1,5 @@
+96274f14678b4231ae18adb4d0c919d9b70f57783350844b51e970c3d55b9bac  docs/audit/CLAIM_AUDIT_PREREG.md
+72fef31a1015ae11c44bb4c40f27b19c0adee5d40732e20869bdb26549dfe6dc  docs/audit/claims_k.py
+9f7896fc1a551c0958073d476c13993ae97010604bf42000793fa471a38d983c  docs/audit/recompute_k.py
+6d1822b4c42f0e8c41ec0808e5350dfc6239a5fd53104b0713ace852eb314a42  tools/claim_audit.py
+frozen_at_utc 2026-09-26T12:02:16Z
