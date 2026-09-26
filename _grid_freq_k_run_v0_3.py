@@ -13,13 +13,16 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 from scipy.signal import detrend
 
-DATA_FILE = Path("/sessions/blissful-focused-lamport/mnt/a/SYNC01.csv")
+# Dane: katalog ze zmiennej TIMDR_DATA, domyslnie ../DATA obok repozytorium (hash pliku sprawdzany nizej).
+DATA_DIR = Path(os.environ.get("TIMDR_DATA", Path(__file__).resolve().parent.parent / "DATA"))
+DATA_FILE = DATA_DIR / "SYNC01.csv"
 WINDOW_SEC = 600.0
 FS_HZ = 1.0
 N_PERMUTATIONS = 2000

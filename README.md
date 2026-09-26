@@ -98,6 +98,10 @@ statystycznej zamiast zgadywać liczby. Pełna metodologia i **jawne
 zastrzeżenie o bardzo małej próbie (~36 okien z jednego zdarzenia)**
 w docstringu modułu; testy w `tests/test_real_data_validation.py`.
 
+Skrypty uruchomieniowe testów poniżej (`_mars_das_k_run*.py`, `_grid_freq_k_run*.py`) szukają
+danych w katalogu ze zmiennej środowiskowej `TIMDR_DATA`, domyślnie `../DATA` obok repozytorium,
+i przed obliczeniami sprawdzają sha256 pliku. Zależności: `pip install -r requirements-validation.txt`.
+
 ### Drugi test: prawdziwy sygnał ŚWIATŁOWODOWY (DAS), nie sejsmometryczny
 
 `docs/PREREG_K_MARS_DAS_v0.1.md` + `docs/RESULT_K_MARS_DAS_v0.1.md` —

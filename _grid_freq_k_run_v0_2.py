@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 from pathlib import Path
 
 import numpy as np
@@ -24,7 +25,9 @@ from timdr_modal.real_data_validation import (  # noqa: E402
 )
 from timdr_modal.phase_sync import Modality, is_resonant  # noqa: E402
 
-DATA_FILE = Path("/sessions/blissful-focused-lamport/mnt/a/SYNC01.csv")
+# Dane: katalog ze zmiennej TIMDR_DATA, domyslnie ../DATA obok repozytorium (hash pliku sprawdzany nizej).
+DATA_DIR = Path(os.environ.get("TIMDR_DATA", Path(__file__).resolve().parent.parent / "DATA"))
+DATA_FILE = DATA_DIR / "SYNC01.csv"
 FS_HZ = 1.0
 WINDOW_SEC = 600.0
 N_PERMUTATIONS = 2000
