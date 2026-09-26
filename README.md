@@ -110,8 +110,8 @@ pobraniem) jako modalności — w odróżnieniu od Ridgecrest, wszystkie
 kanały DAS dzielą JEDEN zegar interrogatora, więc nie trzeba
 przeliczenia offsetu między stacjami. Wynik: kontrola pozytywna
 przechodzi (p≈0.0005, mechanika testu działa), ale test główny
-**NOT SUPPORTED** (p=0.365, 1/60 okien rezonansowych — poniżej
-mediany null permutacyjnego). Uczciwy wynik negatywny, nie porażka
+**NOT SUPPORTED** (p=0.365, 1/60 okien rezonansowych — wynik zgodny z losowym
+parowaniem okien). Uczciwy wynik negatywny, nie porażka
 metody — pełne ograniczenia i "co dalej" w `RESULT_K_MARS_DAS_v0.1.md`.
 
 **v0.2 (poprawka doboru kanałów):** v0.1 użył skrajnych końców
@@ -154,19 +154,24 @@ w rozkładzie `|Δf|`, zostało **sfałszowane** — odsetek dokładnych
 wiązań spadł tylko nieznacznie (96.5%→94.7%), `eps_f` wciąż kalibruje
 się do `0.0`, kontrola pozytywna wciąż nie przechodzi. Dodatkowa
 diagnoza: PT i TR trafiają w ten sam dominujący bin FFT w 94.7% okien
-mimo ~50 kandydujących binów (losowo oczekiwane ~2%) — sugestywna
+mimo ~50 kandydujących binów (przy niezależnych kanałach oczekiwane
+~43%, bo szczyty obu kanałów skupiają się w kilku najniższych binach;
+~2% zakładałoby równomierny rozkład) — sugestywna
 silna zgodność widmowa, ale niezgłaszalna jako potwierdzenie, bo test
 zaprojektowany był do wykrywania ciągłej bliskości, nie dyskretnej
 identyczności. Naprawa wymaga przeprojektowania samej statystyki
-testu (nie kolejnego parametru) — pełne szczegóły w
-`RESULT_K_GRID_FREQ_v0.2.md`.
+testu (nie kolejnego parametru) — pełne szczegóły w `RESULT_K_GRID_FREQ_v0.2.md`. Audyt twierdzeń
+(`docs/audit/`) pokazał, że skrypt v0.2 dopełnia zerami okno bez
+wcześniejszego odjęcia średniej; po odjęciu średniej przed dopełnieniem
+odsetek wiązań spada z 94.7% do 85.9% — część trwałości wiązań wynikała z
+implementacji dopełnienia, nie tylko z danych.
 
 **v0.3 (nowa statystyka — korelacja krzyżowa) — PIERWSZY SUPPORTED w
 tym repo:** zamiast dyskretnej ekstrakcji `(f,φ,A)`+`is_resonant()`,
 korelacja Pearsona zero-lag między odtrendowanymi oknami PT/TR (398
-okien po 600 s). Wynik: `mean(r_w)=0.90` (mediana 0.91), z=78 względem
-null permutacyjnego, p=0.0005, kontrola pozytywna czysta —
-**SUPPORTED**. **Kluczowe zastrzeżenie interpretacyjne**: domena
+okien po 600 s). Wynik: `mean(r_w)=0.90` (mediana 0.91), z=78 względem null permutacyjnego, p=0.0005, kontrola pozytywna przeszła
+(to PT sparowany sam ze sobą, r = 1 z definicji — sprawdza mechanikę, nie
+czułość testu) — **SUPPORTED**. **Kluczowe zastrzeżenie interpretacyjne**: domena
 (częstotliwość sieci AC w jednym obszarze synchronicznym) została
 wybrana WŁAŚNIE dlatego, że fizyka energetyki a priori GWARANTUJE
 wyrównanie częstotliwości — to potwierdza, że formalizm K poprawnie
@@ -180,27 +185,27 @@ interpretacja w `RESULT_K_GRID_FREQ_v0.3.md`.
 **v0.4 (replika na niezależnym oknie) — replikacja potwierdzona:**
 dokładnie ta sama statystyka co v0.3, uruchomiona na drugim, ciągłym
 i nienachodzącym oknie tego samego pliku (305 okien, 2019-08-11, 10 dni
-po oknie v0.3). Wynik: `mean(r_w)=0.92` (mediana 0.92), z=63, p=0.0005,
-kontrola pozytywna czysta — **SUPPORTED**, spójne z v0.3 (mediany i IQR
+po oknie v0.3). Wynik: `mean(r_w)=0.92` (mediana 0.92), z=63, p=0.0005, kontrola pozytywna przeszła — **SUPPORTED**, spójne z v0.3 (mediany i IQR
 obu okien praktycznie się pokrywają). To domyka zastrzeżenie "brak
 repliki" z v0.3 — ale tylko na wymiarze OKNA CZASOWEGO: oba okna
 pochodzą z tego samego 41-dniowego pliku i miesiąca (sierpień 2019),
 więc replika na innym roku/źródle/parze lokalizacji pozostaje otwarta.
 Pełne szczegóły w `RESULT_K_GRID_FREQ_v0.4.md`.
 
-**v0.5 (replika na niezależnym pliku źródłowym) — trzecia replikacja
-potwierdzona:** ta sama statystyka, uruchomiona na osobnych, surowych
+**v0.5 (replika na niezależnym pliku źródłowym) — druga replikacja potwierdzona
+(trzeci wynik SUPPORTED):** ta sama statystyka, uruchomiona na osobnych, surowych
 plikach per-stacja 10 Hz (`PT_LI01_100ms.zip`/`TUR-IS01_100ms.zip`,
 KIT Power Grid Frequency Database, udostępnione osobno 2023-04-21) —
 inny plik i 10× wyższa rozdzielczość niż `SYNC01.csv`, okno przesunięte
 o ~3 tygodnie (2019-07-11/12 vs sierpień). Wynik: `mean(r_w)=0.88`
 (mediana 0.88, IQR 0.86-0.93), z=18.2 (niżej niż v0.3/v0.4 głównie
-przez mniej okien: 44 vs 398/305), p=0.0005, kontrola pozytywna czysta
-— **SUPPORTED**. **Uczciwe zastrzeżenie**: mimo osobnych plików to
+przez mniej okien: 44 vs 398/305), p=0.0005, kontrola pozytywna przeszła — **SUPPORTED**. **Uczciwe zastrzeżenie**: mimo osobnych plików to
 wciąż ta sama kampania pomiarowa 2019 i ta sama para stacji — prawdziwa
-replika na innym roku/innym źródle/innej parze lokalizacji pozostaje
-otwarta. Pełne szczegóły, w tym tabela porównawcza v0.3/v0.4/v0.5, w
-`RESULT_K_GRID_FREQ_v0.5.md`.
+replika na innym roku/innym źródle/innej parze lokalizacji pozostaje otwarta. Pełne szczegóły, w tym tabela porównawcza v0.3/v0.4/v0.5, w `RESULT_K_GRID_FREQ_v0.5.md`.
+Pre-rejestracje v0.4 i v0.5 trafiły do gita w tych samych commitach co
+wyniki (v0.1–v0.3 i oba testy DAS — wcześniej), więc ich kolejność
+potwierdza tylko treść plików. Wszystkie liczby v0.3–v0.5 odtwarzają się
+z surowych danych niezależną implementacją — patrz `docs/audit/`.
 
 ## ⚠️ Czego to NIE robi
 

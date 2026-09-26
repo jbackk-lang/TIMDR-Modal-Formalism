@@ -1,5 +1,8 @@
 """Karty twierdzeń README (gałąź K: MARS DAS, częstotliwość sieci) dla tools/claim_audit.py.
-Reguły: docs/audit/CLAIM_AUDIT_PREREG.md. Przeliczenia z surowych danych: docs/audit/RECOMPUTE_K.json (recompute_k.py).
+Reguły: docs/audit/CLAIM_AUDIT_PREREG.md + CLAIM_AUDIT_ADDENDUM_1.md. Przeliczenia: docs/audit/RECOMPUTE_K.json.
+
+v1.1 (po przebiegu 1 i poprawce README): nowe cytaty D4, G7, G10, G15; nowe karty G21 (D1 w README) i G22 (odtworzenie);
+R6 z ujawnieniem; wzorzec „zawsze” pomija „niemal-zawsze”.
 """
 from __future__ import annotations
 
@@ -179,6 +182,56 @@ def g_chance():
                   "R12: losowa zgodność liczona z rozkładów brzegowych szczytów PT i TR")
 
 
+def d_main_v11():
+    j = res("MARS_DAS_v0.1")
+    ok = r2(j["p_value"], "0.365") and j["n_resonant_real"] == 1 and j["n_windows"] == 60 and j["p_value"] > j["alpha"]
+    return Result(POTWIERDZONE if ok else SPRZECZNE, f"p = {j['p_value']:.3f} > α = {j['alpha']}".replace(".", ","),
+                  "poziom JSON")
+
+
+def g_chance_v11():
+    t = rc()["v01_v03"]["v02"]
+    ch, un = 100 * t["chance_agreement_from_marginals"], 100 * t["chance_agreement_uniform"]
+    ok = r2(100 * t["tie_fraction"], "94.7") and within(50, t["distinct_peak_bins"], approx=True) \
+        and within(43, ch, approx=True) and abs(un - 2) <= 1.0
+    return Result(POTWIERDZONE if ok else SPRZECZNE, f"{t['distinct_peak_bins']} binów; z rozkładów brzegowych {ch:.1f}%, "
+                  f"jednostajnie {un:.1f}%".replace(".", ","), "R12, poziom SUROWE")
+
+
+def g_d1():
+    v = rc()["v01_v03"]
+    script = (REPO / "_grid_freq_k_run_v0_2.py").read_text(encoding="utf-8")
+    ok = "np.pad(s_window" in script and r2(100 * v["v02"]["tie_fraction"], "94.7") \
+        and r2(100 * v["v02_diag_demean_before_pad"]["tie_fraction"], "85.9")
+    return Result(POTWIERDZONE if ok else SPRZECZNE, f"{100 * v['v02']['tie_fraction']:.1f}% → "
+                  f"{100 * v['v02_diag_demean_before_pad']['tie_fraction']:.1f}%".replace(".", ","),
+                  "diagnostyka D1 (pre-rejestrowana); skrypt v0.2 dopełnia surowe okno")
+
+
+def g_trivial_disclosed():
+    r = g_trivial_control()
+    return Result(POTWIERDZONE if r.verdict == DO_ZLAGODZENIA else SPRZECZNE, r.value, "ograniczenie kontroli opisane w README")
+
+
+def g_replica_v11():
+    files = sorted(DOCS.glob("RESULT_K_GRID_FREQ_v0.*.json"))
+    upto = [json.loads(p.read_text()) for p in files if p.name <= "RESULT_K_GRID_FREQ_v0.5.json"]
+    reps = sum("replicates" in j for j in upto)
+    sup = sum(j["verdict"] == "SUPPORTED" for j in upto)
+    ok = reps == 2 and sup == 3
+    return Result(POTWIERDZONE if ok else SPRZECZNE, f"replikacje: {reps}, wyniki SUPPORTED: {sup}", "R11")
+
+
+def g_reproduced():
+    diffs = []
+    for key, name in (("v01_v03", "GRID_FREQ_v0.3"), ("v04", "GRID_FREQ_v0.4"), ("v05", "GRID_FREQ_v0.5")):
+        c, j = rc()[key]["corr"], res(name)
+        diffs.append(max(abs(c["mean_r"] - j["real_stat_mean_corr"]), abs(c["z"] - j["z_score_vs_null"]) / j["z_score_vs_null"],
+                         abs(c["p"] - j["p_value"])))
+    ok = max(diffs) < 1e-6
+    return Result(POTWIERDZONE if ok else SPRZECZNE, f"maks. różnica względem JSON: {max(diffs):.1e}", "poziom SUROWE")
+
+
 def g_first():
     order = sorted(((git_first_commit(REPO, p) or ("", 1e18))[1], json.loads(p.read_text())["verdict"], p.name)
                    for p in DOCS.glob("RESULT_K_*.json"))
@@ -299,7 +352,8 @@ CLAIMS = [
     Claim("D1", "roczny eksperyment DAS na 52-km podmorskim kablu telekomunikacyjnym w Monterey Bay", d_cable),
     Claim("D2", "Dwa kanały (skrajne końce ~14.8 km zarejestrowanego odcinka, reguła geometryczna zamrożona przed pobraniem)", d_ends),
     Claim("D3", "kontrola pozytywna przechodzi (p≈0.0005, mechanika testu działa)", d_posctrl),
-    Claim("D4", "test główny **NOT SUPPORTED** (p=0.365, 1/60 okien rezonansowych — poniżej mediany null permutacyjnego)", d_main),
+    Claim("D4", "test główny **NOT SUPPORTED** (p=0.365, 1/60 okien rezonansowych — wynik zgodny z losowym parowaniem okien)",
+          d_main_v11),
     Claim("D5", "v0.1 użył skrajnych końców kabla (~14,8 km)", d_ends_short),
     Claim("D6", "znacznie dłużej niż `window_sec=1.0s`", d_window),
     Claim("D7", "używa bliskich kanałów (0 i 7, 36,4 m — poniżej progu opóźnienia, powyżej długości bazy pomiarowej 20 m)", d_near),
@@ -312,16 +366,20 @@ CLAIMS = [
                 "FFT przy 600 s ma tylko ~10-11 możliwych wartości)", g_ties),
     Claim("G5", "**v0.2 (poprawka kalibracji — zero-padding FFT 16×):**", g_pad),
     Claim("G6", "odsetek dokładnych wiązań spadł tylko nieznacznie (96.5%→94.7%), `eps_f` wciąż kalibruje się do `0.0`", g_ties_v02),
-    Claim("G7", "PT i TR trafiają w ten sam dominujący bin FFT w 94.7% okien mimo ~50 kandydujących binów (losowo "
-                "oczekiwane ~2%)", g_chance),
+    Claim("G7", "PT i TR trafiają w ten sam dominujący bin FFT w 94.7% okien mimo ~50 kandydujących binów (przy niezależnych "
+                "kanałach oczekiwane ~43%, bo szczyty obu kanałów skupiają się w kilku najniższych binach; ~2% zakładałoby "
+                "równomierny rozkład)", g_chance_v11),
+    Claim("G21", "po odjęciu średniej przed dopełnieniem odsetek wiązań spada z 94.7% do 85.9%", g_d1),
     Claim("G8", "PIERWSZY SUPPORTED w tym repo", g_first),
     Claim("G9", "(398 okien po 600 s). Wynik: `mean(r_w)=0.90` (mediana 0.91), z=78 względem null permutacyjnego, p=0.0005", g_v03),
-    Claim("G10", "kontrola pozytywna czysta — **SUPPORTED**. **Kluczowe zastrzeżenie interpretacyjne**", g_trivial_control),
+    Claim("G10", "kontrola pozytywna przeszła (to PT sparowany sam ze sobą, r = 1 z definicji — sprawdza mechanikę, nie "
+                 "czułość testu)", g_trivial_disclosed),
     Claim("G11", "(305 okien, 2019-08-11, 10 dni po oknie v0.3)", g_v04_window),
     Claim("G12", "`mean(r_w)=0.92` (mediana 0.92), z=63, p=0.0005", g_v04),
     Claim("G13", "spójne z v0.3 (mediany i IQR obu okien praktycznie się pokrywają)", g_overlap),
     Claim("G14", "oba okna pochodzą z tego samego 41-dniowego pliku i miesiąca (sierpień 2019)", g_file41),
-    Claim("G15", "**v0.5 (replika na niezależnym pliku źródłowym) — trzecia replikacja potwierdzona:**", g_replica_count),
+    Claim("G15", "**v0.5 (replika na niezależnym pliku źródłowym) — druga replikacja potwierdzona (trzeci wynik "
+                 "SUPPORTED):**", g_replica_v11),
     Claim("G16", "plikach per-stacja 10 Hz (`PT_LI01_100ms.zip`/`TUR-IS01_100ms.zip`, KIT Power Grid Frequency Database, "
                  "udostępnione osobno 2023-04-21)", g_v05_source),
     Claim("G17", "inny plik i 10× wyższa rozdzielczość niż `SYNC01.csv`, okno przesunięte o ~3 tygodnie (2019-07-11/12 vs "
@@ -329,6 +387,7 @@ CLAIMS = [
     Claim("G18", "`mean(r_w)=0.88` (mediana 0.88, IQR 0.86-0.93), z=18.2", g_v05),
     Claim("G19", "(niżej niż v0.3/v0.4 głównie przez mniej okien: 44 vs 398/305), p=0.0005", g_mainly),
     Claim("G20", "to wciąż ta sama kampania pomiarowa 2019 i ta sama para stacji", g_campaign),
+    Claim("G22", "Wszystkie liczby v0.3–v0.5 odtwarzają się z surowych danych niezależną implementacją", g_reproduced),
 ]
 
 
@@ -350,8 +409,8 @@ COMPLETENESS = [(f"docs/RESULT_K_{n}.json", r'"verdict": "(INCONCLUSIVE|NOT SUPP
 ANCHORS = [(f"docs/PREREG_K_{n}.md", f"docs/RESULT_K_{n}.json") for n in
            ("MARS_DAS_v0.1", "MARS_DAS_v0.2", "GRID_FREQ_v0.1", "GRID_FREQ_v0.2", "GRID_FREQ_v0.3", "GRID_FREQ_v0.4",
             "GRID_FREQ_v0.5")]
-ANCHOR_DISCLOSURE = None
+ANCHOR_DISCLOSURE = r"Pre-rejestracje v0\.4 i v0\.5 trafiły do gita w tych samych commitach"
 FORBIDDEN = [(r"odkryci\w*|odkryw\w*", r"\bnie\b", "gałąź K na sieci wykrywa zjawisko gwarantowane fizyką - nie odkrycie"),
              (r"gałę?zi?\w* K\s+(jest\s+)?(zamknięt|potwierdzon)\w*", r"\bnie\b", "gałąź K nie jest zamknięta")]
-ABSOLUTE = [(r"\btak samo\b", "podaj różnicę"), (r"\bzawsze\b|\bnigdy\b", "słowo bezwzględne"),
+ABSOLUTE = [(r"\btak samo\b", "podaj różnicę"), (r"(?<!niemal-)\bzawsze\b|\bnigdy\b", "słowo bezwzględne"),
             (r"\bdowodzi\b|\budowodni\w*", "„dowodzi” wymaga dowodu"), (r"(?<!\d)100 ?%", "sprawdź liczność")]
