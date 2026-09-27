@@ -211,6 +211,24 @@ wyniki (v0.1–v0.3 i oba testy DAS — wcześniej), więc ich kolejność
 potwierdza tylko treść plików. Wszystkie liczby v0.3–v0.5 odtwarzają się
 z surowych danych niezależną implementacją — patrz `docs/audit/`.
 
+## ⚓ Kotwica modalna i przejście K→G (`timdr_modal/modal_anchor.py`)
+
+Galąź K użyta w praktyce, przeniesiona 1:1 z wersji walidowanych pre-rejestrowanymi testami w
+`GIA-TIMDR` (zgodność bit w bit sprawdzona testami wzorcowymi, `tests/test_modal_anchor.py`):
+
+| Funkcja | Co robi | Wynik walidacji (GIA-TIMDR `docs/geometry/`) |
+|---|---|---|
+| `anchor_frequencies` | samokorygująca kotwica: szczyt ±4% wokół częstotliwości modelu, interpolacja paraboliczna | most KW51: AUC 1,00 (= OMA/SSI autorów), AR 0,67 — **SUPPORTED**; rama LANL: ciężkość ρ −0,57 → +0,98 — **SUPPORTED**; most Hell Bridge (sama kotwica): 0,65 vs AR 0,79 — **NOT SUPPORTED** |
+| `mode_shapes` | przejście K→G: H = S_i,ref / S_ref,ref przy kotwicy, obrót θ = ½·arg ΣH², ψ = Re(H·e^{−iθ}) — kształt modu ze znakiem | Hell Bridge: sam kształt 0,78 vs AR 0,80 — **NOT SUPPORTED**; jako wejście przerwy ciągłości (`TIMDR-Structural-Health`): uszkodzenia pionowe 0,93–0,94 |
+| `anchor_coherence` | dobór kotwic: γ² kanałów z odniesieniem, mediana i p10 ≥ 0,8 | reguła z `PREREG_HBTA_MODAL_CURVATURE_v0_2`; test na danych Hell Bridge odtwarza tę samą decyzję (8 kandydatów → 6) |
+| `n_cycles`, `coherence_cycles` | wykonalność: N_cyk < 10 → sito bez szans; L_koh < N_cyk → zmienić zegar | reguła wykonalności (`docs/theory/TIMDR_Parametry_Przejsc.md`) |
+| `align_signs`, `mac` | znak umowny kształtu; MAC jako znany odpowiednik | — |
+
+Obserwacja z testów: kotwica sama wygrywa, gdy uszkodzenie zmienia globalną sztywność (KW51, LANL);
+przy uszkodzeniu lokalnym potrzebny jest most K→G i szukanie przerwy w przestrzeni. Uczciwie: przy
+rekonstrukcji reguły doboru kotwic p10 dla 12,79 Hz wychodzi 0,62 (PREREG podaje 0,50 — pierwotne
+liczenie nie było zapisane w kodzie); decyzja jest ta sama. Moduł wymaga `scipy`.
+
 ## ⚠️ Czego to NIE robi
 
 Nie implementuje sprzężenia oscylatorów (Kuramoto-style), nie
